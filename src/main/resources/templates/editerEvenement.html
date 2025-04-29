@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8">
+    <title>Ajout d’un Événement</title>
+    <link rel="stylesheet" type="text/css"
+          href="/webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+</head>
+<body>
+<div th:replace="template"></div>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            Modifier un Événement
+        </div>
+        <div class="card-body">
+            <form th:action="@{saveEvenement}" method="post">
+                <div class="form-group">
+                    <label class="control-label" hidden>ID Événement :</label>
+                    <input type="hidden" name="idEvenement" class="form-control"
+                           th:value="${evenement.idEvenement}" />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Nom Événement :</label>
+                    <input type="text" name="nomEvenement" class="form-control"
+                           th:value="${evenement.nomEvenement}" />
+                    <span th:errors="${evenement.nomEvenement}" class="text-danger"> </span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Prix Événement :</label>
+                    <input type="text" name="prixEvenement" class="form-control"
+                           th:value="${evenement.prixEvenement}" />
+                    <span th:errors="${evenement.prixEvenement}" class="text-danger"> </span>
+                </div>
+
+				<div class="form-group">
+				    <label class="control-label">Date de l'événement :</label>
+				    <input type="date" name="dateEvenement" class="form-control"
+				           th:value="${#dates.format(evenement.dateEvenement, 'yyyy-MM-dd')}" 
+				           required />
+				    <span th:errors="${evenement.dateEvenement}" class="text-danger"></span>
+				</div>
+                    <button type="submit" class="btn btn-primary">Valider</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

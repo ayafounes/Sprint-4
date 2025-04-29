@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title th:text="${mode=='new'} ? 'Ajout des Événements' : 'Modification des Événements'"></title>
+    <link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header" th:if="${mode=='new'}">Ajout d'un Événement</div>
+            <div class="card-header" th:if="${mode=='edit'}">Modification d'un Événement</div>
+            <div class="card-body">
+                <form th:action="@{${mode=='new'} ? '/saveEvenement' : '/updateEvenement'}" method="post">
+                    
+                    <!-- Champ HIDDEN pour le mode -->
+                    <input type="hidden" name="mode" th:value="${mode}" />
+
+                    <!-- Champ ID caché (visible seulement en mode édition) -->
+                    <div class="form-group" th:if="${mode=='edit'}">
+                        <input type="hidden" name="idEvenement" class="form-control"
+                               th:value="${evenement.idEvenement}" />
+                    </div>
+
+                    <!-- Champ Nom -->
+                    <div class="form-group">
+                        <label class="control-label">Nom Événement :</label>
+                        <input type="text" name="nomEvenement" class="form-control"
+                               th:value="${evenement.nomEvenement}" required />
+                        <span th:errors="${evenement.nomEvenement}" class="text-danger"></span>
+                    </div>
+
+                    <!-- Champ Prix -->
+                    <div class="form-group">
+                        <label class="control-label">Prix :</label>
+                        <input type="number" name="prixEvenement" step="0.01" class="form-control"
+                               th:value="${evenement.prixEvenement}" required />
+                        <span th:errors="${evenement.prixEvenement}" class="text-danger"></span>
+                    </div>
+
+                    <!-- Date de l'Événement -->
+                    <div class="form-group">
+                        <label class="control-label">Date de l'événement :</label>
+                        <input type="date" name="dateEvenement" class="form-control"
+                               th:value="${#dates.format(evenement.dateEvenement, 'yyyy-MM-dd')}" required />
+                        <span th:errors="${evenement.dateEvenement}" class="text-danger"></span>
+                    </div>
+
+                    <!-- Genre -->
+                    <div class="form-group">
+                        <label class="control-label">Genre :</label>
+
+                        <!-- Si genre présent -->
+                        <select name="genre.idGenre" class="form-control"
+                                th:if="${!#strings.isEmpty(evenement.genre)}">
+                            <option th:each="genre : ${genres}" 
+                                    th:value="${genre.idGenre}"
+                                    th:text="${genre.nomGenre}"
+                                    th:selected="${genre.idGenre == evenement.genre.idGenre}">
+                            </option>
+                        </select>
+
+                        <!-- Si genre absent -->
+                        <select name="genre.idGenre" class="form-control"
+                                th:if="${#strings.isEmpty(evenement.genre)}">
+                            <option value="">-- Sélectionner --</option>
+                            <option th:each="genre : ${genres}" 
+                                    th:value="${genre.idGenre}"
+                                    th:text="${genre.nomGenre}">
+                            </option>
+                        </select>
+
+                        <span th:errors="${evenement.genre}" class="text-danger"></span>
+                    </div>
+
+                    <!-- Bouton de soumission -->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" 
+                                th:text="${mode=='new'} ? 'Ajouter' : 'Modifier'"></button>
+                        <a th:href="@{/ListeEvenements}" class="btn btn-secondary ml-2">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="webjars/jquery/3.4.1/jquery.min.js"></script>
+    <script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

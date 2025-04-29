@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Liste des Événements</title>
+  <link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css"/>
+</head>
+<body>
+<div th:replace="template"></div>
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header">
+      Liste des Événements
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom Événement</th>
+          <th>Prix</th>
+          <th>Date</th>
+          <th>Genre</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="e : ${evenements}">
+          <td th:text="${e.idEvenement}"></td>
+          <td th:text="${e.nomEvenement}"></td>
+          <td th:text="${e.prixEvenement}"></td>
+          <td th:text="${#dates.format(e.dateEvenement, 'dd/MM/yyyy')}"></td>
+          <td th:if="${e.genre != null}" th:text="${e.genre.nomGenre}"></td>
+          <td th:if="${e.genre == null}" th:text="'Pas de Genre'"></td>
+          <td sec:authorize="hasAuthority('ADMIN')">
+            <a class="btn btn-success"
+               th:href="@{modifierEvenement(id=${e.idEvenement})}">Editer</a>
+            <a class="btn btn-danger" onclick="return confirm('Etes-vous sûr ?')"
+               th:href="@{supprimerEvenement(id=${e.idEvenement}, page=${currentPage}, size=${size})}">Supprimer</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+	  <ul class="nav nav-pills">
+	                      <li th:each="page,status : ${pages}">
+	                          <a th:class="${status.index == currentPage ? 'btn btn-primary' : 'btn'}"
+	                             th:href="@{/ListeEvenements(page=${status.index}, size=${size})}"
+	                             th:text="${status.index + 1}">
+	                          </a>
+	                      </li>
+	                  </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>
