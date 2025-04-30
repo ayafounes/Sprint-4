@@ -71,42 +71,67 @@ public class EvenementController {
     // Sauvegarder l'événement (ajout ou modification)
     @RequestMapping("/saveEvenement")
     public String saveEvenement(@Valid @ModelAttribute("evenement") EvenementDTO evenement,
-                              BindingResult bindingResult,
-                              @RequestParam("mode") String mode,
-                              @RequestParam(name = "page", defaultValue = "0") int page,
-                              @RequestParam(name = "size", defaultValue = "2") int size,
-                              ModelMap modelMap) {
+                                BindingResult bindingResult,
+                                @RequestParam("mode") String mode,
+                                @RequestParam(name = "page", defaultValue = "0") int page,
+                                @RequestParam(name = "size", defaultValue = "2") int size,
+                                ModelMap modelMap) {
         
+        // Vérification des erreurs de validation
         if (bindingResult.hasErrors()) {
             List<Genre> genres = evenementService.getAllGenres();
             modelMap.addAttribute("genres", genres);
             modelMap.addAttribute("mode", mode); // Important pour conserver le mode
             return "formEvenement";
         }
-       
 
+        // Variable pour savoir si l'événement est nouveau
+        int currentPage;
+        boolean isNew = false;
+
+        // Si l'événement est nouveau, on crée un nouvel événement
         if ("new".equals(mode)) {
             evenementService.saveEvenement(evenement);
+            isNew = true;
         } else {
+            // Sinon, on met à jour l'événement
             evenementService.updateEvenement(evenement);
         }
 
-        return "redirect:/ListeEvenements?page=" + page + "&size=" + size;
+        // Gestion de la pagination
+        if (isNew) {
+            // Si l'événement est nouveau, on redirige vers la dernière page
+            Page<Evenement> evenements = evenementService.getAllEvenementsParPage(page, size);
+            currentPage = evenements.getTotalPages() - 1;
+        } else {
+            // Sinon, on conserve la page courante
+            currentPage = page;
+        }
+
+        // Redirection vers la liste des événements avec pagination
+        return "redirect:/ListeEvenements?page=" + currentPage + "&size=" + size;
     }
+
 
     // Modifier un événement
     @RequestMapping("/modifierEvenement")
-    public String editerEvenement(@RequestParam("id") Long id, ModelMap modelMap) {
-        EvenementDTO e = evenementService.getEvenement(id);
+    public String editerEvenement(@RequestParam("id") Long id,
+                                  @RequestParam(name = "page", defaultValue = "0") int page,
+                                  @RequestParam(name = "size", defaultValue = "2") int size,
+                                  ModelMap modelMap) {
+        
+        EvenementDTO e = evenementService.getEvenement(id); // DTO logic preserved
+        List<Genre> genres = evenementService.getAllGenres();
+
         modelMap.addAttribute("evenement", e);
         modelMap.addAttribute("mode", "edit");
-
-        // Ajouter les genres disponibles
-        List<Genre> genres = evenementService.getAllGenres();
         modelMap.addAttribute("genres", genres);
+        modelMap.addAttribute("page", page);
+        modelMap.addAttribute("size", size);
 
         return "formEvenement";
     }
+
 
     // Supprimer un événement
     @RequestMapping("/supprimerEvenement")
